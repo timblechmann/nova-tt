@@ -1,0 +1,3 @@
+[submodule "boost_lockfree"]
+	path = boost_lockfree
+	url = git://klingt.org/boost_lockfree.git
