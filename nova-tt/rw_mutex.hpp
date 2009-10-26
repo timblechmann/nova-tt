@@ -16,6 +16,7 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file rw_mutex.hpp */
 
 #ifndef NOVA_TT_RW_MUTEX_HPP
 #define NOVA_TT_RW_MUTEX_HPP
@@ -33,6 +34,11 @@
 namespace nova
 {
 
+/** non-recursive reader-writer mutex class, implementing a subset of the SharedLockable concept
+ *
+ *  except for bool timed_lock_shared(boost::system_time  const&  abs_time) all SharedLockable members
+ *  are provided
+ * */
 class nonrecursive_rw_mutex
 {
 public:
@@ -113,6 +119,11 @@ public:
     typedef boost::shared_lock<nonrecursive_rw_mutex> shared_lock;
 };
 
+/** reader-writer mutex class, implementing a subset of the SharedLockable concept
+ *
+ *  except for bool timed_lock_shared(boost::system_time  const&  abs_time) all SharedLockable members
+ *  are provided
+ * */
 class rw_mutex:
     public nonrecursive_rw_mutex
 {

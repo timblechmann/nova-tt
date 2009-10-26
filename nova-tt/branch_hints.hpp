@@ -16,9 +16,10 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file branch_hints.hpp */
+
 #ifndef NOVA_TT_BRANCH_HINTS_HPP
 #define NOVA_TT_BRANCH_HINTS_HPP
-
 
 namespace nova
 {
@@ -41,6 +42,7 @@ inline bool unlikely(bool expr)
     return expr;
 #endif
 }
-}
+
+} /* namespace nova */
 
 #endif /* NOVA_TT_BRANCH_HINTS_HPP */

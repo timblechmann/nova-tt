@@ -16,6 +16,9 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file nanosleep.hpp */
+/** \namespace nova */
+
 
 #ifndef NOVA_TT_NANOSLEEP_HPP
 #define NOVA_TT_NANOSLEEP_HPP
@@ -56,6 +59,8 @@ inline void nanosleep(unsigned long sec, unsigned long ns)
 
 } /* namespace detail */
 
+/** sleep for ns nanoseconds
+ */
 inline void nanosleep(unsigned long ns)
 {
     if (ns < detail::ns_per_s)

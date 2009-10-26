@@ -16,6 +16,7 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file rw_spinlock.hpp */
 
 #ifndef RW_SPINLOCK_HPP
 #define RW_SPINLOCK_HPP
@@ -23,15 +24,23 @@
 #include <cerrno>
 #include <cassert>
 
-#include "boost/thread/locks.hpp"
+#include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
 
 #include "boost/lockfree/detail/cas.hpp"
 
 namespace nova
 {
 
+/** non-recursive reader-writer spinlock, implements a subset of the SharedLockable concept
+ *
+ *  except for bool timed_lock_shared(boost::system_time  const&  abs_time) all SharedLockable members
+ *  are provided
+ */
 class rw_spinlock
 {
+    typedef boost::uint32_t uint32_t;
+
     static const uint32_t unlocked_state = 0;
     static const uint32_t locked_state = 0x80000000;
     static const uint32_t reader_mask  = 0x7fffffff;

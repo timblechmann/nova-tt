@@ -16,6 +16,9 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file spin_lock.hpp */
+
+
 #ifndef NOVA_TT_SPIN_LOCK_HPP
 #define NOVA_TT_SPIN_LOCK_HPP
 
@@ -30,6 +33,8 @@
 namespace nova
 {
 
+/** spinlock, implements the Lockable concept
+ */
 class spin_lock:
     public boost::noncopyable
 {

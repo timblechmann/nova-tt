@@ -18,6 +18,8 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file semaphore.hpp */
+
 #ifndef NOVA_TT_SEMAPHORE_HPP
 #define NOVA_TT_SEMAPHORE_HPP
 
@@ -31,8 +33,8 @@
 #include <semaphore.h>
 
 #else
-#define BOOST_SEMAPHORE_EMULATION
 
+#define BOOST_SEMAPHORE_EMULATION
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 
@@ -42,6 +44,8 @@
 namespace nova
 {
 #ifdef POSIX_SEMAPHORE_WRAPPER
+
+/** semaphore class */
 class semaphore:
     boost::noncopyable
 {
@@ -56,21 +60,25 @@ public:
         sem_destroy(&sem);
     }
 
-    /** \brief signal semaphore */
+    /** signal semaphore */
     void post(void)
     {
         int status = sem_post(&sem);
         assert(status == 0);
     }
 
-    /** \brief wait until this semaphore is signaled */
+    /** wait until this semaphore is signaled */
     void wait(void)
     {
         int status = sem_wait(&sem);
         assert(status == 0);
     }
 
-    /** \brief dummy */
+    /** try to wait for the semaphore
+     *
+     * \return true, if the value can be decremented
+     *         false, otherweise
+     */
     bool try_wait(void)
     {
         int status = sem_trywait(&sem);
@@ -95,6 +103,8 @@ private:
 
 #elif defined(BOOST_SEMAPHORE_EMULATION)
 #warning boost semaphore emulation
+
+/** semaphore class */
 class semaphore:
     boost::noncopyable
 {
@@ -103,7 +113,7 @@ public:
         m_count(i)
     {}
 
-    /** \brief signal semaphore */
+    /** signal semaphore */
     void post(void)
     {
         boost::mutex::scoped_lock lock(m_mutex);
@@ -111,13 +121,36 @@ public:
         m_cond.notify_one();
     }
 
-    /** \brief wait until this semaphore is signaled */
+    /** wait until this semaphore is signaled */
     void wait(void)
     {
         boost::mutex::scoped_lock lock(m_mutex);
         while (m_count==0)
             m_cond.wait(lock); /** \todo check! valgrind complains about this */
         --m_count;
+    }
+
+    /** try to wait for the semaphore
+     *
+     * \return true, if the value can be decremented
+     *         false, otherweise
+     */
+    bool try_wait(void)
+    {
+        bool success = m_mutex.try_lock();
+        if (!success)
+            return false;
+        bool ret;
+
+        if (m_count == 0)
+            ret = false;
+        else {
+            --m_count;
+            ret = true;
+        }
+
+        m_mutex.unlock();
+        return ret;
     }
 
     int value(void)

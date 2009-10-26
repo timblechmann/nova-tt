@@ -16,6 +16,8 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
+/** \file dummy_mutex.hpp */
+
 #ifndef NOVA_TT_DUMMY_MUTEX_HPP
 #define NOVA_TT_DUMMY_MUTEX_HPP
 
@@ -33,20 +35,25 @@ class dummy_mutex:
     public boost::noncopyable
 {
 public:
+    /** noop */
     dummy_mutex(void)
     {}
 
+    /** noop */
     ~dummy_mutex(void)
     {}
 
+    /** noop */
     void lock(void)
     {}
 
+    /** noop */
     bool try_lock(void)
     {
         return true;
     }
 
+    /** noop */
     void unlock(void)
     {}
 
