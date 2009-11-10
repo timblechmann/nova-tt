@@ -5,5 +5,5 @@
 
 BOOST_AUTO_TEST_CASE( affinity_test )
 {
-    BOOST_REQUIRE(!nova::thread_set_affinity(0));
+    BOOST_REQUIRE(nova::thread_set_affinity(0));
 }
