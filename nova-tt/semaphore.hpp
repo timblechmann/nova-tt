@@ -1,7 +1,7 @@
-//  semaphore class, posix & boost.thread wrappers,
+//  semaphore class
 //  based on API proposed in N2043
 //
-//  Copyright (C) 2008 Tim Blechmann
+//  Copyright (C) 2009 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,154 +23,12 @@
 #ifndef NOVA_TT_SEMAPHORE_HPP
 #define NOVA_TT_SEMAPHORE_HPP
 
-#include <cassert>
-
-#include <boost/noncopyable.hpp>
-
 #if (_POSIX_SEMAPHORES - 0) >= 200112L
-
-#define POSIX_SEMAPHORE_WRAPPER
-#include <semaphore.h>
-
+#include "semaphore_posix.hpp"
+//#elif defined(__APPLE__)
+//#include "semaphore_mach.hpp"
 #else
-
-#define BOOST_SEMAPHORE_EMULATION
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-
+#include "semaphore_boost_fallback.hpp"
 #endif
-
-
-namespace nova
-{
-#ifdef POSIX_SEMAPHORE_WRAPPER
-
-/** semaphore class */
-class semaphore:
-    boost::noncopyable
-{
-public:
-    semaphore(unsigned int i=0)
-    {
-        sem_init(&sem, 0, i);
-    }
-
-    ~semaphore(void)
-    {
-        sem_destroy(&sem);
-    }
-
-    /** signal semaphore */
-    void post(void)
-    {
-        int status = sem_post(&sem);
-        assert(status == 0);
-    }
-
-    /** wait until this semaphore is signaled */
-    void wait(void)
-    {
-        int status = sem_wait(&sem);
-        assert(status == 0);
-    }
-
-    /** try to wait for the semaphore
-     *
-     * \return true, if the value can be decremented
-     *         false, otherweise
-     */
-    bool try_wait(void)
-    {
-        int status = sem_trywait(&sem);
-        return status == 0;
-    }
-
-    int value(void)
-    {
-        int ret;
-        bool status = sem_getvalue(&sem, &ret);
-        assert(status == 0);
-
-        if (ret < 0)
-            return 0;
-        else
-            return ret;
-    }
-
-private:
-    sem_t sem;
-};
-
-#elif defined(BOOST_SEMAPHORE_EMULATION)
-#warning boost semaphore emulation
-
-/** semaphore class */
-class semaphore:
-    boost::noncopyable
-{
-public:
-    semaphore(int i=0):
-        m_count(i)
-    {}
-
-    /** signal semaphore */
-    void post(void)
-    {
-        boost::mutex::scoped_lock lock(m_mutex);
-        ++m_count;
-        m_cond.notify_one();
-    }
-
-    /** wait until this semaphore is signaled */
-    void wait(void)
-    {
-        boost::mutex::scoped_lock lock(m_mutex);
-        while (m_count==0)
-            m_cond.wait(lock); /** \todo check! valgrind complains about this */
-        --m_count;
-    }
-
-    /** try to wait for the semaphore
-     *
-     * \return true, if the value can be decremented
-     *         false, otherweise
-     */
-    bool try_wait(void)
-    {
-        bool success = m_mutex.try_lock();
-        if (!success)
-            return false;
-        bool ret;
-
-        if (m_count == 0)
-            ret = false;
-        else {
-            --m_count;
-            ret = true;
-        }
-
-        m_mutex.unlock();
-        return ret;
-    }
-
-    int value(void)
-    {
-        boost::mutex::scoped_lock lock(m_mutex);
-        return m_count;
-    }
-
-private:
-    unsigned int m_count;
-    boost::mutex m_mutex;
-    boost::condition m_cond;
-};
-
-#else
-#error this point should not be reached!
-#endif
-
-} // namespace nova
-
-#undef POSIX_SEMAPHORE_WRAPPER
 
 #endif /* NOVA_TT_SEMAPHORE_HPP */
