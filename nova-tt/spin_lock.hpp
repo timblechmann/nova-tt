@@ -1,4 +1,4 @@
-//  spin_lock class, wrapper for pthread's spinlock
+//  spin_lock class
 //  Copyright (C) 2008 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -18,68 +18,13 @@
 
 /** \file spin_lock.hpp */
 
-
 #ifndef NOVA_TT_SPIN_LOCK_HPP
 #define NOVA_TT_SPIN_LOCK_HPP
 
-#include <cerrno>
-#include <cassert>
-
-#include <boost/noncopyable.hpp>
-#include <boost/thread/locks.hpp>
-
-#include <pthread.h>
-
-namespace nova
-{
-
-/** spinlock, implements the Lockable concept
- */
-class spin_lock:
-    public boost::noncopyable
-{
-public:
-    spin_lock(void)
-    {
-        int status = pthread_spin_init(&lock_, PTHREAD_PROCESS_PRIVATE);
-        assert(status == 0);
-    }
-
-    ~spin_lock(void)
-    {
-        int status = pthread_spin_destroy(&lock_);
-        assert(status == 0);
-    }
-
-    void lock(void)
-    {
-        int status = pthread_spin_lock(&lock_);
-        assert(status == 0);
-    }
-
-    bool try_lock(void)
-    {
-        int status = pthread_spin_trylock(&lock_);
-
-        if (status == EBUSY)
-            return false;
-        assert(status == 0);
-        return true;
-    }
-
-    void unlock(void)
-    {
-        int status = pthread_spin_unlock(&lock_);
-        assert(status == 0);
-    }
-
-    typedef boost::lock_guard<spin_lock> scoped_lock;
-
-private:
-    pthread_spinlock_t lock_;
-};
-
-
-} /* namespace nova */
+#if defined(__APPLE__)
+#include "spin_lock_apple.hpp"
+#else
+#include "spin_lock_pthread.hpp"
+#endif
 
 #endif /* NOVA_TT_SPIN_LOCK_HPP */
