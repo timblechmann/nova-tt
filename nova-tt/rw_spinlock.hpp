@@ -1,5 +1,5 @@
 //  reader-writer spinlock
-//  Copyright (C) 2009 Tim Blechmann
+//  Copyright (C) 2009-2010 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
 
-#include "boost/lockfree/detail/cas.hpp"
+#include "boost/atomic.hpp"
 
 namespace nova
 {
@@ -63,14 +63,15 @@ public:
     {
         for(;;)
         {
-            if (boost::lockfree::cas(&state, uint32_t(unlocked_state), uint32_t(locked_state)))
+            if (try_lock())
                 return;
         }
     }
 
     bool try_lock(void)
     {
-        if (boost::lockfree::cas(&state, uint32_t(unlocked_state), uint32_t(locked_state)))
+        uint32_t expected = unlocked_state;
+        if (state.compare_exchange_strong(expected, locked_state))
             return true;
         else
             return false;
@@ -78,9 +79,8 @@ public:
 
     void unlock(void)
     {
-        assert(state == locked_state);
-        boost::lockfree::memory_barrier(); /* the previous write operations need to be completed */
-        state = unlocked_state;
+        assert(state.load(boost::memory_order_relaxed) == locked_state);
+        state.store(unlocked_state, boost::memory_order_release);
     }
 
     void lock_shared(void)
@@ -94,10 +94,11 @@ public:
 
     bool try_lock_shared(void)
     {
-        const uint32_t current_state = state & reader_mask; /* with the mask, the cas will fail, locked exclusively */
-        const uint32_t next_state    = current_state + 1;
+        /* with the mask, the cas will fail, locked exclusively */
+        uint32_t current_state    = state.load(boost::memory_order_acquire) & reader_mask;
+        const uint32_t next_state = current_state + 1;
 
-        if (boost::lockfree::cas(&state, current_state, next_state))
+        if (state.compare_exchange_strong(current_state, next_state))
             return true;
         else
             return false;
@@ -107,16 +108,16 @@ public:
     {
         for(;;)
         {
-            const uint32_t current_state = state; /* we don't need the reader_mask */
-            const uint32_t next_state    = current_state - 1;
+            uint32_t current_state    = state; /* we don't need the reader_mask */
+            const uint32_t next_state = current_state - 1;
 
-            if (boost::lockfree::cas(&state, current_state, next_state))
+            if (state.compare_exchange_strong(current_state, uint32_t(next_state)))
                 return;
         }
     }
 
 private:
-    uint32_t state;
+    boost::atomic<uint32_t> state;
 };
 
 } /* namespace nova */
