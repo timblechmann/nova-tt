@@ -77,17 +77,13 @@ namespace
     void sleep ()
     {
         boost::thread::yield();
-/*        boost::xtime time;
-        xtime_get(&time, 0);
-        time.nsec += 1000;
-        boost::thread::sleep(time);*/
     }
 
     void test_fn(void)
     {
         static rw_mutex mut;
 
-        for (int i = 0; i != 200000; ++i)
+        for (int i = 0; i != 100000; ++i)
         {
             /* recursive read locks */
             {
