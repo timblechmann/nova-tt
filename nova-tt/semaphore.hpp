@@ -31,4 +31,27 @@
 #include "semaphore_boost_fallback.hpp"
 #endif
 
+namespace nova
+{
+
+/** helper class for semaphore synchronization
+ *
+ *  destructor will wait for the semaphore to be signaled
+ */
+struct semaphore_sync
+{
+    semaphore_sync(semaphore & sem):
+        sem(sem)
+    {}
+
+    ~semaphore_sync(void)
+    {
+        sem.wait();
+    }
+
+    semaphore & sem;
+};
+
+} /* namespace nova */
+
 #endif /* NOVA_TT_SEMAPHORE_HPP */

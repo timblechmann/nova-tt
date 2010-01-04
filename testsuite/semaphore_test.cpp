@@ -38,3 +38,10 @@ BOOST_AUTO_TEST_CASE( sem_test )
 
     BOOST_REQUIRE_EQUAL(count, 8000000);
 }
+
+BOOST_AUTO_TEST_CASE( sem_sync_test )
+{
+    semaphore sem(0);
+    sem.post();
+    semaphore_sync sync(sem);
+}
