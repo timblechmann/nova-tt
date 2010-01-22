@@ -9,6 +9,7 @@
 using namespace nova;
 
 const uint thread_count = 8;
+const uint total_count = 30000;
 
 template <typename Mutex>
 void nonrecursive_tests(void)
@@ -83,7 +84,7 @@ namespace
     {
         static rw_mutex mut;
 
-        for (int i = 0; i != 100000; ++i)
+        for (int i = 0; i != total_count; ++i)
         {
             /* recursive read locks */
             {
