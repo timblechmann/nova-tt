@@ -1,5 +1,5 @@
 //  spin_lock class
-//  Copyright (C) 2008 Tim Blechmann
+//  Copyright (C) 2010 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,10 +21,52 @@
 #ifndef NOVA_TT_SPIN_LOCK_HPP
 #define NOVA_TT_SPIN_LOCK_HPP
 
-#if defined(__APPLE__)
-#include "spin_lock_apple.hpp"
-#else
-#include "spin_lock_pthread.hpp"
-#endif
+#include <boost/noncopyable.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/atomic.hpp>
+
+namespace nova
+{
+
+/** spinlock, implements the Lockable concept
+ */
+class spin_lock:
+    public boost::noncopyable
+{
+    typedef enum {locked_state,
+                  unlocked_state} lock_state;
+    boost::atomic<lock_state> state;
+
+public:
+    typedef boost::lock_guard<spin_lock> scoped_lock;
+
+    spin_lock(void):
+        state(unlocked_state)
+    {}
+
+    ~spin_lock(void)
+    {
+        assert (state == unlocked_state);
+    }
+
+    void lock(void)
+    {
+        while(!try_lock())
+            ;
+    }
+
+    bool try_lock(void)
+    {
+        return state.exchange(locked_state, boost::memory_order_acquire) == unlocked_state;
+    }
+
+    void unlock(void)
+    {
+        assert(state.load(boost::memory_order_relaxed) == locked_state);
+        state.store(unlocked_state, boost::memory_order_release);
+    }
+};
+
+} /* namespace nova */
 
 #endif /* NOVA_TT_SPIN_LOCK_HPP */

@@ -11,6 +11,7 @@ using namespace boost;
 namespace
 {
 const int thread_count = 8;
+const int total_count = 5000;
 
 int count = 0;
 
@@ -18,7 +19,7 @@ spin_lock sl;
 
 void test_fn(void)
 {
-    for (int i = 0; i != 10000; ++i)
+    for (int i = 0; i != total_count; ++i)
     {
         spin_lock::scoped_lock lock(sl);
         ++count;
@@ -36,5 +37,5 @@ BOOST_AUTO_TEST_CASE( spinlock_test )
         g.create_thread(test_fn);
     g.join_all();
 
-    BOOST_REQUIRE_EQUAL(count, 80000);
+    BOOST_REQUIRE_EQUAL(count, thread_count * total_count);
 }
