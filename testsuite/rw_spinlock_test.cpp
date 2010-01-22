@@ -35,7 +35,7 @@ rw_spinlock guard;
 uint32_t dummy = 0;
 uint32_t counter = 0;
 
-const uint iterations = 50000;
+const uint iterations = 20000;
 const uint thread_count = 8;
 
 void test_fn(void)
