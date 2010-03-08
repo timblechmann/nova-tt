@@ -22,7 +22,6 @@
 #define NOVA_TT_SPIN_LOCK_HPP
 
 #include <boost/noncopyable.hpp>
-#include <boost/thread/locks.hpp>
 #include <boost/atomic.hpp>
 
 namespace nova
@@ -38,7 +37,21 @@ class spin_lock:
     boost::atomic<lock_state> state;
 
 public:
-    typedef boost::lock_guard<spin_lock> scoped_lock;
+    struct scoped_lock
+    {
+        scoped_lock(spin_lock & sl):
+            sl_(sl)
+        {
+            sl_.lock();
+        }
+
+        ~scoped_lock(void)
+        {
+            sl_.unlock();
+        }
+
+        spin_lock & sl_;
+    };
 
     spin_lock(void):
         state(unlocked_state)

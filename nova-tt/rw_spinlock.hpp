@@ -25,7 +25,6 @@
 #include <cassert>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
 
 #include "boost/atomic.hpp"
 
@@ -46,9 +45,39 @@ class rw_spinlock
     static const uint32_t reader_mask  = 0x7fffffff;
 
 public:
-    typedef boost::lock_guard<rw_spinlock> scoped_lock;
-    typedef boost::unique_lock<rw_spinlock> unique_lock;
-    typedef boost::shared_lock<rw_spinlock> shared_lock;
+    struct scoped_lock
+    {
+        scoped_lock(rw_spinlock & sl):
+            sl_(sl)
+        {
+            sl_.lock();
+        }
+
+        ~scoped_lock(void)
+        {
+            sl_.unlock();
+        }
+
+        rw_spinlock & sl_;
+    };
+
+    typedef scoped_lock unique_lock;
+
+    struct shared_lock
+    {
+        shared_lock(rw_spinlock & sl):
+            sl_(sl)
+        {
+            sl_.lock_shared();
+        }
+
+        ~shared_lock(void)
+        {
+            sl_.unlock_shared();
+        }
+
+        rw_spinlock & sl_;
+    };
 
     rw_spinlock(void):
         state(unlocked_state)
