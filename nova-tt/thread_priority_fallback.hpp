@@ -1,4 +1,4 @@
-//  cross-platform wrapper for nanosleep
+//
 //  Copyright (C) 2010 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,31 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#ifndef NOVA_TT_THREAD_PRITORITY_HPP
-#define NOVA_TT_THREAD_PRITORITY_HPP
+#ifndef NOVA_TT_THREAD_PRITORITY_FALLBACK_HPP
+#define NOVA_TT_THREAD_PRITORITY_FALLBACK_HPP
 
-#if (_POSIX_PRIORITY_SCHEDULING - 0) >=  200112L || (_POSIX_MEMLOCK - 0) >=  200112L
-#include "thread_priority_pthread.hpp"
-#elif (__APPLE__)
-#include "thread_priority_mach.hpp"
-#else
-#include "thread_priority_fallback.hpp"
-#endif
+#include <utility>
 
-#endif /* NOVA_TT_THREAD_PRITORITY_HPP */
+namespace nova
+{
+
+inline int thread_priority(void)
+{
+    return 0;
+}
+
+inline std::pair<int, int> thread_priority_interval(void)
+{
+    return std::make_pair(0, 0);
+}
+
+inline bool thread_set_priority(int priority)
+{
+    return false;
+}
+
+}  /* namespace nova */
+
+#undef USE_PTHREAD
+
+#endif /* NOVA_TT_THREAD_PRITORITY_FALLBACK_HPP */
