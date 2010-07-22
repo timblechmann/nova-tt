@@ -49,7 +49,7 @@ inline int thread_priority(void)
 
 inline std::pair<int, int> thread_priority_interval(void)
 {
-    return std::make_pair(PTHREAD_MIN_PRIORITY, PTHREAD_MAX_PRIORITY);
+    return std::make_pair(0, 0);
 }
 
 inline bool thread_set_priority(int priority)
@@ -65,16 +65,16 @@ inline bool thread_set_priority(int priority)
     return status == 0;
 }
 
-inline bool thread_set_priority_rt(int period_ns, int computation_ns, int constraint_ns, bool preemptible)
+inline bool thread_set_priority_rt(int period, int computation, int constraint, bool preemptible)
 {
     pthread_t this_thread = pthread_self();
 
     thread_time_constraint_policy_data_t policy;
-    policy.period = AudioConvertNanosToHostTime(period);
-    policy.computation = AudioConvertNanosToHostTime(computation);
-    policy.constraint = AudioConvertNanosToHostTime(constraint);
+    policy.period = period;
+    policy.computation = computation_ns;
+    policy.constraint = constraint_ns;
     policy.preemptible = 0;
-    kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread),
+    kern_return_t res = thread_policy_set(pthread_mach_thread_np(this_thread),
                                           THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&policy,
                                           THREAD_TIME_CONSTRAINT_POLICY_COUNT);
     return res == KERN_SUCCESS;
