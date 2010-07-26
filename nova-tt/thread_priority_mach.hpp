@@ -71,8 +71,8 @@ inline bool thread_set_priority_rt(int period, int computation, int constraint, 
 
     thread_time_constraint_policy_data_t policy;
     policy.period = period;
-    policy.computation = computation_ns;
-    policy.constraint = constraint_ns;
+    policy.computation = computation;
+    policy.constraint = constraint;
     policy.preemptible = 0;
     kern_return_t res = thread_policy_set(pthread_mach_thread_np(this_thread),
                                           THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&policy,
