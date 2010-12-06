@@ -1,3 +1,3 @@
 [submodule "boost_lockfree"]
 	path = boost_lockfree
-	url = git://klingt.org/boost_lockfree.git
+	url = git://supercollider.git.sourceforge.net/gitroot/supercollider/boost-lockfree
