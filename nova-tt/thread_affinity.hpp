@@ -40,7 +40,7 @@ inline bool thread_set_affinity(int i)
 
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
-    CPU_SET(i, &cpuset);
+    int status = CPU_SET(i, &cpuset);
     int error = pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
 
     return error == 0;
