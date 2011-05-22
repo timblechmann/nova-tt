@@ -23,12 +23,16 @@
 
 #include <cassert>
 #include <semaphore.h>
+
 #include <boost/noncopyable.hpp>
+#include <boost/static_assert.hpp>
+
 
 namespace nova
 {
 
 /** semaphore class */
+template <bool has_timed_wait = false>
 class semaphore:
     boost::noncopyable
 {
@@ -65,6 +69,18 @@ public:
     bool try_wait(void)
     {
         int status = sem_trywait(&sem);
+        return status == 0;
+    }
+
+    /** try to wait for the semaphore until timeout
+     *
+     * \return true, if the value can be decremented
+     *         false, otherweise
+     */
+    bool timed_wait(struct timespec const & absolute_timeout)
+    {
+        BOOST_STATIC_ASSERT(has_timed_wait);
+        int status = sem_timedwait(&sem, &absolute_timeout);
         return status == 0;
     }
 

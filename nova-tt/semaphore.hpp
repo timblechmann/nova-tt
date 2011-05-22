@@ -38,9 +38,10 @@ namespace nova
  *
  *  destructor will wait for the semaphore to be signaled
  */
+template <typename Semaphore>
 struct semaphore_sync
 {
-    semaphore_sync(semaphore & sem):
+    semaphore_sync(Semaphore & sem):
         sem(sem)
     {}
 
@@ -49,7 +50,7 @@ struct semaphore_sync
         sem.wait();
     }
 
-    semaphore & sem;
+    Semaphore & sem;
 };
 
 } /* namespace nova */

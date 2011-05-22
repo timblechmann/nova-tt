@@ -26,13 +26,18 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 
+#include <boost/mpl/if.hpp>
+
 namespace nova
 {
 
 /** semaphore class */
+template <bool has_timed_wait = false>
 class semaphore:
     boost::noncopyable
 {
+    typedef typename boost::mpl::if_c<has_timed_wait, boost::timed_mutex, boost::mutex>::type mutex_type;
+
 public:
     semaphore(int i=0):
         m_count(i)
@@ -78,6 +83,36 @@ public:
         return ret;
     }
 
+    /** try to wait for the semaphore until timeout
+     *
+     * \return true, if the value can be decremented
+     *         false, otherweise
+     */
+    bool timed_wait(struct timespec const & absolute_timeout)
+    {
+        BOOST_STATIC_ASSERT(has_timed_wait);
+
+        using namespace boost::posix_time;
+        const ptime epoch(boost::gregorian::date(1970, 1, 1));
+
+        ptime timeout = epoch + seconds(absolute_timeout.tv_sec) + microsec(absolute_timeout.tv_nsec / 1000);
+
+        bool success = m_mutex.timed_lock(timeout);
+        if (success) {
+            bool ret;
+            if (m_count == 0)
+                ret = false;
+            else {
+                --m_count;
+                ret = true;
+            }
+
+            m_mutex.unlock();
+            return ret;
+        } else
+            return false;
+    }
+
     int value(void)
     {
         boost::mutex::scoped_lock lock(m_mutex);
@@ -86,7 +121,7 @@ public:
 
 private:
     unsigned int m_count;
-    boost::mutex m_mutex;
+    mutex_type m_mutex;
     boost::condition m_cond;
 };
 
