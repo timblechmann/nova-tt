@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE( sem_timed_wait )
 namespace
 {
 const int thread_count = 8;
+const int iterations_per_thread = 100000;
 
 int count = 0;
 
@@ -41,8 +42,7 @@ semaphore<false> s(1);
 
 void test_fn(void)
 {
-    for (int i = 0; i != 1000000; ++i)
-    {
+    for (int i = 0; i != iterations_per_thread; ++i) {
         s.wait();
         ++count;
         s.post();
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( sem_test )
         g.create_thread(test_fn);
     g.join_all();
 
-    BOOST_REQUIRE_EQUAL(count, 8000000);
+    BOOST_REQUIRE_EQUAL(count, iterations_per_thread * thread_count);
 }
 
 BOOST_AUTO_TEST_CASE( sem_sync_test )

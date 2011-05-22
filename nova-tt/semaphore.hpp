@@ -25,8 +25,13 @@
 
 #if (_POSIX_SEMAPHORES - 0) >= 200112L
 #include "semaphore_posix.hpp"
+
 //#elif defined(__APPLE__)
 //#include "semaphore_mach.hpp"
+
+#elif defined(_POSIX_VERSION)
+#include "semaphore_pthreads.hpp"
+
 #else
 #include "semaphore_boost_fallback.hpp"
 #endif
