@@ -27,11 +27,13 @@
 #include <mach/semaphore.h>
 #include <mach/task.h>
 
+#include <time.h>
 
 namespace nova
 {
 
 /** semaphore class */
+template <bool has_timed_wait = false>
 class semaphore:
     boost::noncopyable
 {
@@ -70,8 +72,41 @@ public:
     bool try_wait(void)
     {
         /* is it possible to implement this with the mach semaphore api? */
-        assert(false);
+        kern_result_t status = semaphore_wait_noblock(&sem);
+        return (status == KERN_SUCCESS);
     }
+
+    /** try to wait for the semaphore until timeout
+     *
+     * \return true, if the value can be decremented
+     *         false, otherweise
+     */
+    bool timed_wait(const struct timespec * absolute_timeout)
+    {
+        BOOST_STATIC_ASSERT(has_timed_wait);
+        clock_t clk = clock();
+        for (;;) {
+            if (try_wait())
+                return true;
+
+            timespec now;
+            int status = clock_gettime(clk, &now);
+            assert(status);
+
+            if (now.tv_sec > absolute_timeout.tv_sec ||
+                (now.tv_sec == absolute_timeout.tv_sec ||
+                 now.tv_nsec >= absolute_timeout.tv_nsec))
+                return false; // timeout
+
+            timespec wait_time;
+            wait_time.tv_nsec = 100000;
+            wait_time.tv_sec = 0;
+
+            timespec remain;
+            nanosleep(wait_time, remain);
+        }
+    }
+
 
     int value(void)
     {

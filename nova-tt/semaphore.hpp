@@ -25,8 +25,13 @@
 
 #if (_POSIX_SEMAPHORES - 0) >= 200112L
 #include "semaphore_posix.hpp"
+
 //#elif defined(__APPLE__)
 //#include "semaphore_mach.hpp"
+
+#elif defined(_POSIX_VERSION)
+#include "semaphore_pthreads.hpp"
+
 #else
 #include "semaphore_boost_fallback.hpp"
 #endif
@@ -38,9 +43,10 @@ namespace nova
  *
  *  destructor will wait for the semaphore to be signaled
  */
+template <typename Semaphore>
 struct semaphore_sync
 {
-    semaphore_sync(semaphore & sem):
+    semaphore_sync(Semaphore & sem):
         sem(sem)
     {}
 
@@ -49,7 +55,7 @@ struct semaphore_sync
         sem.wait();
     }
 
-    semaphore & sem;
+    Semaphore & sem;
 };
 
 } /* namespace nova */
