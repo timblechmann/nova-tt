@@ -23,6 +23,10 @@
 #ifndef NOVA_TT_SEMAPHORE_HPP
 #define NOVA_TT_SEMAPHORE_HPP
 
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# include <unistd.h>
+#endif
+
 #if (_POSIX_SEMAPHORES - 0) >= 200112L
 #include "semaphore_posix.hpp"
 
