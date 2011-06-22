@@ -40,8 +40,10 @@
 #include "semaphore_boost_fallback.hpp"
 #endif
 
-namespace nova
-{
+namespace nova {
+
+typedef nova_tt::semaphore<false> semaphore;
+typedef nova_tt::semaphore<true>  timed_semaphore;
 
 /** helper class for semaphore synchronization
  *

@@ -28,8 +28,8 @@
 #include <boost/static_assert.hpp>
 
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
 
 /** semaphore class */
 template <bool has_timed_wait = false>
@@ -100,6 +100,7 @@ private:
     sem_t sem;
 };
 
+} // namespace nova_tt
 } // namespace nova
 
 #endif /* NOVA_TT_SEMAPHORE_POSIX_HPP */

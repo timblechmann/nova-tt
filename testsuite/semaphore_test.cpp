@@ -21,7 +21,7 @@ inline timespec ptime_to_timespec (const boost::posix_time::ptime &tm)
 
 BOOST_AUTO_TEST_CASE( sem_timed_wait )
 {
-    semaphore<true> sem;
+    timed_semaphore sem;
 
     system_time const timeout = get_system_time() + posix_time::milliseconds(500);
 
@@ -38,7 +38,7 @@ const int iterations_per_thread = 100000;
 
 int count = 0;
 
-semaphore<false> s(1);
+semaphore s(1);
 
 void test_fn(void)
 {
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( sem_test )
 
 BOOST_AUTO_TEST_CASE( sem_sync_test )
 {
-    semaphore<false> sem(0);
+    semaphore sem(0);
     sem.post();
-    semaphore_sync<semaphore<false> > sync(sem);
+    semaphore_sync<semaphore> sync(sem);
 }
