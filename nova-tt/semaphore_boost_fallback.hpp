@@ -28,8 +28,8 @@
 
 #include <boost/mpl/if.hpp>
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
 
 /** semaphore class */
 template <bool has_timed_wait = false>
@@ -125,6 +125,7 @@ private:
     boost::condition m_cond;
 };
 
+} // namespace nova_tt
 } // namespace nova
 
 #endif /* NOVA_TT_SEMAPHORE_BOOST_FALLBACK_HPP */

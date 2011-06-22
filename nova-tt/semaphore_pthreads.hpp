@@ -25,8 +25,8 @@
 
 #include <pthread.h>
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
 
 /** semaphore class */
 template <bool has_timed_wait = false>
@@ -138,6 +138,7 @@ private:
     pthread_cond_t m_cond;
 };
 
+} // namespace nova_tt
 } // namespace nova
 
 #endif /* NOVA_TT_SEMAPHORE_PTHREADS_HPP */

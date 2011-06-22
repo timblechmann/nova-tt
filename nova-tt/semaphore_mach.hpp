@@ -29,8 +29,8 @@
 
 #include <time.h>
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
 
 /** semaphore class */
 template <bool has_timed_wait = false>
@@ -118,6 +118,7 @@ private:
     semaphore_t sem;
 };
 
+} // namespace nova_tt
 } // namespace nova
 
 #endif /* NOVA_TT_SEMAPHORE_MACH_HPP */
