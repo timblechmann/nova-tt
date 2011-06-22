@@ -31,8 +31,8 @@
 #include "branch_hints.hpp"
 
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
 
 /** non-recursive reader-writer mutex class, implementing a subset of the SharedLockable concept
  *
@@ -64,17 +64,16 @@ public:
     {
         int status = pthread_rwlock_trywrlock(&rwlock);
 
-        switch (status)
-        {
-            case 0:
-                return true;
+        switch (status) {
+        case 0:
+            return true;
 
-            case EBUSY:
-                return false;
+        case EBUSY:
+            return false;
 
-            case EDEADLK:
-            default:
-                assert(false);
+        case EDEADLK:
+        default:
+            assert(false);
         }
     }
 
@@ -144,8 +143,7 @@ public:
     {
         int status = pthread_rwlock_wrlock(&rwlock);
 
-        switch (status)
-        {
+        switch (status) {
         case 0:
             writer_id = pthread_self();
             assert(writelock_count == 0);
@@ -164,8 +162,7 @@ public:
     {
         int status = pthread_rwlock_trywrlock(&rwlock);
 
-        switch (status)
-        {
+        switch (status) {
         case 0:
             assert(writer_id == 0);
             assert(writelock_count == 0);
@@ -182,9 +179,7 @@ public:
                 assert(writelock_count > 0);
                 ++writelock_count;
                 return true;
-            }
-            else
-            {
+            } else {
                 assert(writer_id != pthread_self());
                 return false;
             }
@@ -198,8 +193,7 @@ public:
     {
         assert(writelock_count > 0);
         assert(writer_id);
-        if (--writelock_count == 0)
-        {
+        if (--writelock_count == 0) {
             writer_id = 0;
             nonrecursive_rw_mutex::unlock();
         }
@@ -239,6 +233,11 @@ private:
                           * set during the write lock
                           */
 };
+
+} /* namespace nova-tt */
+
+using nova_tt::nonrecursive_rw_mutex;
+using nova_tt::rw_mutex;
 
 } /* namespace nova */
 

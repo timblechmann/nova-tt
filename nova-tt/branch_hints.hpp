@@ -21,8 +21,9 @@
 #ifndef NOVA_TT_BRANCH_HINTS_HPP
 #define NOVA_TT_BRANCH_HINTS_HPP
 
-namespace nova
-{
+namespace nova {
+namespace nova_tt {
+
 /** \brief hint for the branch prediction */
 inline bool likely(bool expr)
 {
@@ -43,6 +44,7 @@ inline bool unlikely(bool expr)
 #endif
 }
 
+} /* namespace nova-tt */
 } /* namespace nova */
 
 #endif /* NOVA_TT_BRANCH_HINTS_HPP */
