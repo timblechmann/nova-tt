@@ -24,10 +24,13 @@
 #include <cassert>
 #include <boost/noncopyable.hpp>
 
+#include <mach/mach_traps.h>
 #include <mach/semaphore.h>
 #include <mach/task.h>
+#include <mach/mach.h>
 
 #include <time.h>
+#include <sys/time.h>
 
 namespace nova {
 namespace nova_tt {
@@ -46,21 +49,21 @@ public:
 
     ~semaphore(void)
     {
-        kern_return_t status = semaphore_destroy(mach_task_self(), &sem);
+        kern_return_t status = semaphore_destroy(mach_task_self(), sem);
         assert(status == KERN_SUCCESS);
     }
 
     /** signal semaphore */
     void post(void)
     {
-        kern_return_t status = semaphore_signal(&sem);
+        kern_return_t status = semaphore_signal(sem);
         assert(status == KERN_SUCCESS);
     }
 
     /** wait until this semaphore is signaled */
     void wait(void)
     {
-        kern_return_t status = semaphore_wait(&sem);
+        kern_return_t status = semaphore_wait(sem);
         assert(status == KERN_SUCCESS);
     }
 
@@ -71,8 +74,13 @@ public:
      */
     bool try_wait(void)
     {
+#ifndef __LP64__
         /* is it possible to implement this with the mach semaphore api? */
-        kern_result_t status = semaphore_wait_noblock(&sem);
+        kern_return_t status = semaphore_wait_noblock(&sem);
+#else
+        mach_timespec_t wait_time = {0, 0};
+        kern_return_t status = semaphore_timedwait(sem, wait_time);
+#endif
         return (status == KERN_SUCCESS);
     }
 
@@ -81,7 +89,7 @@ public:
      * \return true, if the value can be decremented
      *         false, otherweise
      */
-    bool timed_wait(const struct timespec * absolute_timeout)
+    bool timed_wait(struct timespec const & absolute_timeout)
     {
         BOOST_STATIC_ASSERT(has_timed_wait);
         clock_t clk = clock();
@@ -90,8 +98,15 @@ public:
                 return true;
 
             timespec now;
+#if _POSIX_TIMERS > 0
             int status = clock_gettime(clk, &now);
             assert(status);
+#else
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            now.tv_sec = tv.tv_sec;
+            now.tv_nsec = tv.tv_usec*1000;
+#endif
 
             if (now.tv_sec > absolute_timeout.tv_sec ||
                 (now.tv_sec == absolute_timeout.tv_sec ||
@@ -103,7 +118,7 @@ public:
             wait_time.tv_sec = 0;
 
             timespec remain;
-            nanosleep(wait_time, remain);
+            nanosleep(&wait_time, &remain);
         }
     }
 

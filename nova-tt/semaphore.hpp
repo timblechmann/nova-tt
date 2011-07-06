@@ -30,10 +30,10 @@
 #if (_POSIX_SEMAPHORES - 0) >= 200112L
 #include "semaphore_posix.hpp"
 
-//#elif defined(__APPLE__)
-//#include "semaphore_mach.hpp"
+#elif defined(__APPLE__)
+#include "semaphore_mach.hpp"
 
-#elif defined(_POSIX_VERSION)
+#elif defined(_POSIX_TIMEOUTS) && (_POSIX_TIMEOUTS - 200112L) >= 0L
 #include "semaphore_pthreads.hpp"
 
 #else
