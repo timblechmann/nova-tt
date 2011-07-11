@@ -90,8 +90,13 @@ public:
 
     void lock(void)
     {
-        while(!try_lock())
-            ;
+        for (;;) {
+            while (state.load(boost::memory_order_relaxed) != unlocked_state)
+            {}
+            uint32_t expected = unlocked_state;
+            if (state.compare_exchange_weak(expected, locked_state, boost::memory_order_acquire))
+                return;
+        }
     }
 
     bool try_lock(void)
@@ -111,8 +116,14 @@ public:
 
     void lock_shared(void)
     {
-        while(!try_lock_shared())
-            ;
+        for(;;) {
+            /* with the mask, the cas will fail, locked exclusively */
+            uint32_t current_state    = state.load(boost::memory_order_acquire) & reader_mask;
+            const uint32_t next_state = current_state + 1;
+
+            if (state.compare_exchange_weak(current_state, next_state, boost::memory_order_acquire))
+                return;
+        }
     }
 
     bool try_lock_shared(void)
@@ -134,7 +145,7 @@ public:
             uint32_t current_state    = state.load(boost::memory_order_relaxed); /* we don't need the reader_mask */
             const uint32_t next_state = current_state - 1;
 
-            if (state.compare_exchange_strong(current_state, uint32_t(next_state)))
+            if (state.compare_exchange_weak(current_state, uint32_t(next_state)))
                 return;
         }
     }

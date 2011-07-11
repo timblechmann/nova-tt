@@ -1,5 +1,5 @@
 //  spin_lock class
-//  Copyright (C) 2010 Tim Blechmann
+//  Copyright (C) 2010, 2011 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,8 +21,9 @@
 #ifndef NOVA_TT_SPIN_LOCK_HPP
 #define NOVA_TT_SPIN_LOCK_HPP
 
-#include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace nova
 {
@@ -32,9 +33,9 @@ namespace nova
 class spin_lock:
     public boost::noncopyable
 {
-    typedef enum {locked_state,
-                  unlocked_state} lock_state;
-    boost::atomic<lock_state> state;
+    static const bool locked_state = 0;
+    static const bool unlocked_state = 1;
+    boost::atomic<boost::uint8_t> state;
 
 public:
     struct scoped_lock
@@ -64,8 +65,12 @@ public:
 
     void lock(void)
     {
-        while(!try_lock())
-            ;
+        for(;;) {
+            while (state.load(boost::memory_order_relaxed) != unlocked_state)
+            {}
+            if (try_lock())
+                return;
+        }
     }
 
     bool try_lock(void)
