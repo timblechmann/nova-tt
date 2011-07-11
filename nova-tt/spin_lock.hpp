@@ -85,6 +85,13 @@ public:
     }
 };
 
+struct padded_spin_lock:
+    public spin_lock
+{
+    static const int padding_bytes = 64 - sizeof(spin_lock);
+    boost::uint8_t padding[padding_bytes];
+};
+
 } /* namespace nova */
 
 #endif /* NOVA_TT_SPIN_LOCK_HPP */

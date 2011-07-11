@@ -1,5 +1,5 @@
 //  reader-writer spinlock
-//  Copyright (C) 2009-2010 Tim Blechmann
+//  Copyright (C) 2009-2011 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -140,8 +140,7 @@ public:
 
     void unlock_shared(void)
     {
-        for(;;)
-        {
+        for(;;) {
             uint32_t current_state    = state.load(boost::memory_order_relaxed); /* we don't need the reader_mask */
             const uint32_t next_state = current_state - 1;
 
@@ -153,6 +152,14 @@ public:
 private:
     boost::atomic<uint32_t> state;
 };
+
+struct padded_rw_spinlock:
+    public rw_spinlock
+{
+    static const int padding_bytes = 64 - sizeof(rw_spinlock);
+    boost::uint8_t padding[padding_bytes];
+};
+
 
 } /* namespace nova */
 
