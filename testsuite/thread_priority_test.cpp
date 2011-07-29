@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE( priority_test )
 #ifdef NOVA_TT_PRIORITY_PERIOD_COMPUTATION_CONSTRAINT
     int ns_per_tick = 1e9 / 44100 * 64;
 
-    BOOST_CHECK(thread_set_priority_rt(ns_per_tick, ns_per_tick - 2, ns_per_tick - 1));
+    BOOST_CHECK(thread_set_priority_rt(ns_per_tick, ns_per_tick - 2, ns_per_tick - 1, false));
 #endif
 
 }
