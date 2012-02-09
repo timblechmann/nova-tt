@@ -35,12 +35,12 @@ rw_spinlock guard;
 uint32_t dummy = 0;
 uint32_t counter = 0;
 
-const uint iterations = 20000;
-const uint thread_count = 8;
+const unsigned int iterations = 20000;
+const unsigned int thread_count = 8;
 
 void test_fn(void)
 {
-    for (uint i = 0; i != iterations; ++i)
+    for (unsigned int i = 0; i != iterations; ++i)
     {
         guard.lock();
         counter += 1;
@@ -60,7 +60,7 @@ void test_fn(void)
 BOOST_AUTO_TEST_CASE( rw_spinlock_test_2 )
 {
     boost::thread_group threads;
-    for (uint i = 0; i != thread_count; ++i)
+    for (unsigned int i = 0; i != thread_count; ++i)
         threads.create_thread(&test_fn);
 
     threads.join_all();

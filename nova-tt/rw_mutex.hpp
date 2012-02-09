@@ -1,5 +1,5 @@
 //  read-write mutex class
-//  Copyright (C) 2007, 2009 Tim Blechmann
+//  Copyright (C) 2007, 2009, 2012 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,12 +24,15 @@
 #include <cerrno>
 #include <cassert>
 
+#include "boost/thread/shared_mutex.hpp"
+
+#ifdef _WIN32
+#include "boost/thread/shared_mutex.hpp"
+#endif
+
 #include "pthread.h"
-
 #include "boost/thread/locks.hpp"
-
 #include "branch_hints.hpp"
-
 
 namespace nova {
 namespace nova_tt {
@@ -117,6 +120,13 @@ public:
     typedef boost::unique_lock<nonrecursive_rw_mutex> unique_lock;
     typedef boost::shared_lock<nonrecursive_rw_mutex> shared_lock;
 };
+
+#ifdef _WIN32
+
+// we cannot use the posix-based rw_mutex, as we cannot access the write_id, so we use boost's implementation instead
+typedef boost::shared_mutex rw_mutex;
+
+#else
 
 /** reader-writer mutex class, implementing a subset of the SharedLockable concept
  *
@@ -233,6 +243,8 @@ private:
                           * set during the write lock
                           */
 };
+
+#endif
 
 } /* namespace nova-tt */
 
