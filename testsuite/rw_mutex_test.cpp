@@ -8,15 +8,15 @@
 
 using namespace nova;
 
-const uint thread_count = 8;
-const uint total_count = 30000;
+const int thread_count = 8;
+const int total_count = 30000;
 
 template <typename Mutex>
 void nonrecursive_tests(void)
 {
     Mutex mut;
 
-    typedef typename Mutex::shared_lock scoped_read_lock;
+    typedef boost::shared_lock<Mutex> scoped_read_lock;
 
     mut.lock_shared();
     mut.lock_shared();
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE( rw_mutex_test )
 namespace
 {
     rw_mutex mut;
-    typedef rw_mutex::shared_lock scoped_read_lock;
-    typedef rw_mutex::unique_lock scoped_write_lock;
+    typedef boost::shared_lock<rw_mutex> scoped_read_lock;
+    typedef boost::unique_lock<rw_mutex> scoped_write_lock;
 
     void sleep ()
     {

@@ -28,6 +28,8 @@
 
 #include <boost/mpl/if.hpp>
 
+#include <pthread.h>
+
 namespace nova {
 namespace nova_tt {
 
