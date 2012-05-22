@@ -19,6 +19,11 @@
 #ifndef NOVA_TT_THREAD_PRITORITY_HPP
 #define NOVA_TT_THREAD_PRITORITY_HPP
 
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# include <unistd.h>
+#endif
+
+
 #if (_POSIX_PRIORITY_SCHEDULING - 0) >=  200112L || (_POSIX_MEMLOCK - 0) >=  200112L
 #include "thread_priority_pthread.hpp"
 #elif (__APPLE__)

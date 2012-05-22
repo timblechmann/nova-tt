@@ -25,6 +25,10 @@
 
 #include <cassert>
 
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# include <unistd.h>
+#endif
+
 #if (_POSIX_TIMERS - 0) >= 200112L
 #include <time.h>
 #endif /* _POSIX_TIMERS */
