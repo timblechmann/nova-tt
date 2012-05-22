@@ -21,9 +21,9 @@
 #ifndef NOVA_TT_MLOCK_HPP
 #define NOVA_TT_MLOCK_HPP
 
-#ifdef __unix__
-#include <unistd.h>
-#endif /* __unix__ */
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# include <unistd.h>
+#endif
 
 #ifdef _POSIX_MEMLOCK_RANGE
 #include <sys/mman.h>
