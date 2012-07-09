@@ -80,7 +80,7 @@ public:
     };
 
     rw_spinlock(void):
-        state(unlocked_state)
+        state(uint32_t(unlocked_state))
     {}
 
     ~rw_spinlock(void)
