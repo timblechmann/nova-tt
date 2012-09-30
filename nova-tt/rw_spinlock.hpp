@@ -95,7 +95,7 @@ public:
             {}
             uint32_t expected = unlocked_state;
             if (state.compare_exchange_weak(expected, locked_state, boost::memory_order_acquire))
-                return;
+                break;
         }
     }
 
@@ -122,7 +122,7 @@ public:
             const uint32_t next_state = current_state + 1;
 
             if (state.compare_exchange_weak(current_state, next_state, boost::memory_order_acquire))
-                return;
+                break;
         }
     }
 
@@ -145,7 +145,7 @@ public:
             const uint32_t next_state = current_state - 1;
 
             if (state.compare_exchange_weak(current_state, uint32_t(next_state)))
-                return;
+                break;
         }
     }
 

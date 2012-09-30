@@ -69,7 +69,7 @@ public:
             while (state.load(boost::memory_order_relaxed) != unlocked_state)
             {}
             if (try_lock())
-                return;
+                break;
         }
     }
 
