@@ -77,6 +77,7 @@ public:
         case EDEADLK:
         default:
             assert(false);
+            return false;
         }
     }
 
@@ -106,6 +107,7 @@ public:
             return false;
 
         assert(false);
+        return false;
     }
 
     void unlock_shared(void)
@@ -196,6 +198,7 @@ public:
 
         default:
             assert(false);
+            return false;
         }
     }
 
