@@ -21,6 +21,8 @@
 #ifndef NOVA_TT_SPIN_LOCK_HPP
 #define NOVA_TT_SPIN_LOCK_HPP
 
+#include <cassert>
+
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
