@@ -27,8 +27,9 @@
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 
-namespace nova
-{
+#include "pause.hpp"
+
+namespace nova {
 
 /** spinlock, implements the Lockable concept
  */
@@ -69,7 +70,8 @@ public:
     {
         for(;;) {
             while (state.load(boost::memory_order_relaxed) != unlocked_state)
-            {}
+                detail::pause();
+
             if (try_lock())
                 break;
         }

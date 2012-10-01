@@ -21,15 +21,16 @@
 #ifndef RW_SPINLOCK_HPP
 #define RW_SPINLOCK_HPP
 
-#include <cerrno>
 #include <cassert>
+#include <cerrno>
 
-#include <boost/cstdint.hpp>
 
 #include "boost/atomic.hpp"
+#include <boost/cstdint.hpp>
 
-namespace nova
-{
+#include "pause.hpp"
+
+namespace nova {
 
 /** non-recursive reader-writer spinlock, implements a subset of the SharedLockable concept
  *
@@ -92,7 +93,8 @@ public:
     {
         for (;;) {
             while (state.load(boost::memory_order_relaxed) != unlocked_state)
-            {}
+                detail::pause();
+
             uint32_t expected = unlocked_state;
             if (state.compare_exchange_weak(expected, locked_state, boost::memory_order_acquire))
                 break;
@@ -123,6 +125,7 @@ public:
 
             if (state.compare_exchange_weak(current_state, next_state, boost::memory_order_acquire))
                 break;
+            detail::pause();
         }
     }
 
@@ -146,6 +149,7 @@ public:
 
             if (state.compare_exchange_weak(current_state, uint32_t(next_state)))
                 break;
+            detail::pause();
         }
     }
 
