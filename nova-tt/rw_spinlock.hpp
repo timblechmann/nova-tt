@@ -157,7 +157,7 @@ private:
     boost::atomic<uint32_t> state;
 };
 
-struct padded_rw_spinlock:
+class padded_rw_spinlock:
     public rw_spinlock
 {
     static const int padding_bytes = 64 - sizeof(rw_spinlock);
