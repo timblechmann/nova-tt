@@ -70,7 +70,7 @@ public:
     void wait(void)
     {
         int status = WaitForSingleObject(
-            ghSemaphore,   // handle to semaphore
+            ghSemaphore,
             INFINITE);           // wait forever
         assert(status == 0);
         //TODO: report error status
@@ -84,7 +84,7 @@ public:
     bool try_wait(void)
     {
         int status = WaitForSingleObject(
-            ghSemaphore,   // handle to semaphore
+            ghSemaphore,
             0L);           // zero-second time-out interval
         return status == 0;
     }
@@ -96,11 +96,10 @@ public:
      */
     bool timed_wait(struct timespec const & absolute_timeout)
     {
-        assert(false);
         long milisecons = 0 ;//TODO absolute_timeout - now
         BOOST_STATIC_ASSERT(has_timed_wait);
         int status = WaitForSingleObject(
-            ghSemaphore,   // handle to semaphore
+            ghSemaphore,
             milisecons);   // zero-second time-out interval
         return status == 0;
     }
