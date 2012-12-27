@@ -27,7 +27,10 @@
 # include <unistd.h>
 #endif
 
-#if (_POSIX_SEMAPHORES - 0) >= 200112L
+#if defined(_WIN32)
+#include "semaphore_win32.hpp"
+
+#elif (_POSIX_SEMAPHORES - 0) >= 200112L
 #include "semaphore_posix.hpp"
 
 // mach semaphores seem to be broken
