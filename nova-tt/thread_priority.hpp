@@ -28,6 +28,8 @@
 #include "thread_priority_pthread.hpp"
 #elif (__APPLE__)
 #include "thread_priority_mach.hpp"
+#elif (_WIN32)
+#include "thread_priority_win32.hpp"
 #else
 #include "thread_priority_fallback.hpp"
 #endif
