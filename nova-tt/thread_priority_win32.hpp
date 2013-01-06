@@ -26,12 +26,11 @@
 
 #define NOVA_TT_PRIORITY_RT
 
-
 namespace nova {
 
 inline std::pair<int, int> thread_priority_interval()
 {
-    return std::make_pair(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+    return std::make_pair(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_NORMAL);
 }
 
 inline bool thread_set_priority(int priority)
@@ -46,16 +45,12 @@ inline bool thread_set_priority(int priority)
 
 inline std::pair<int, int> thread_priority_interval_rt()
 {
-    return thread_priority_interval();
+    return std::make_pair(THREAD_PRIORITY_ABOVE_NORMAL, THREAD_PRIORITY_TIME_CRITICAL);
 }
 
 inline bool thread_set_priority_rt(int priority)
 {
     HANDLE this_thread = GetCurrentThread();
-    bool success = SetPriorityClass(this_thread, REALTIME_PRIORITY_CLASS);
-    if (!success)
-        return false;
-
     return SetThreadPriority(this_thread, priority);
 }
 

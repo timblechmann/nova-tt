@@ -8,9 +8,11 @@ set(tests
     semaphore_test.cpp
     spin_lock_test.cpp
     thread_affinity_test.cpp
+    thread_pool_test.cpp
     thread_priority_test.cpp
 )
 
+add_definitions(-std=c++11) # for thread_pool
 
 foreach(test ${tests})
   string(REPLACE .cpp "" test_name ${test} )
