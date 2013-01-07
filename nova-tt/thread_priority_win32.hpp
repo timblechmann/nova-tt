@@ -36,10 +36,6 @@ inline std::pair<int, int> thread_priority_interval()
 inline bool thread_set_priority(int priority)
 {
     HANDLE this_thread = GetCurrentThread();
-    bool success = SetPriorityClass(this_thread, NORMAL_PRIORITY_CLASS);
-    if (!success)
-        return false;
-
     return SetThreadPriority(this_thread, priority);
 }
 
@@ -50,8 +46,7 @@ inline std::pair<int, int> thread_priority_interval_rt()
 
 inline bool thread_set_priority_rt(int priority)
 {
-    HANDLE this_thread = GetCurrentThread();
-    return SetThreadPriority(this_thread, priority);
+    return thread_set_priority(priority);
 }
 
 }  /* namespace nova */
