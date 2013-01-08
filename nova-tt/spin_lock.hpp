@@ -1,5 +1,5 @@
 //  spin_lock class
-//  Copyright (C) 2010, 2011 Tim Blechmann
+//  Copyright (C) 2010 - 2013 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 #include <cassert>
 
 #include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 
 #include "pause.hpp"
 
@@ -33,12 +31,19 @@ namespace nova {
 
 /** spinlock, implements the Lockable concept
  */
-class spin_lock:
-    public boost::noncopyable
+class spin_lock
 {
     static const bool locked_state = 0;
     static const bool unlocked_state = 1;
-    boost::atomic<boost::uint8_t> state;
+    boost::atomic<bool> state;
+
+#ifdef __cplusplus >= 201103L
+    spin_lock(spin_lock const & rhs) = delete;
+    spin_lock & operator=(spin_lock const & rhs) = delete;
+#else
+    spin_lock(spin_lock const & rhs);
+    spin_lock & operator=(spin_lock const & rhs);
+#endif
 
 public:
     struct scoped_lock
