@@ -1,5 +1,5 @@
 //  spin_lock class
-//  Copyright (C) 2010 - 2013 Tim Blechmann
+//  Copyright (C) 2010, 2011 Tim Blechmann
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class spin_lock
     static const bool unlocked_state = 1;
     boost::atomic<bool> state;
 
-#ifdef __cplusplus >= 201103L
+#if __cplusplus >= 201103L
     spin_lock(spin_lock const & rhs) = delete;
     spin_lock & operator=(spin_lock const & rhs) = delete;
 #else

@@ -45,7 +45,7 @@ class rw_spinlock
     static const uint32_t locked_state = 0x80000000;
     static const uint32_t reader_mask  = 0x7fffffff;
 
-#ifdef __cplusplus >= 201103L
+#if __cplusplus >= 201103L
     rw_spinlock(rw_spinlock const & rhs) = delete;
     rw_spinlock & operator=(rw_spinlock const & rhs) = delete;
 #else
