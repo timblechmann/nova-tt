@@ -22,6 +22,7 @@
 #define NOVA_TT_SEMAPHORE_WIN32_HPP
 
 #include <cassert>
+#include <limits>
 
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
@@ -42,7 +43,7 @@ public:
         ghSemaphore = CreateSemaphore(
             NULL,           // default security attributes
             i,  // initial count
-            INT_MAX,  // maximum count
+            (std::numeric_limits<LONG>::numeric_limits::max)(),  // maximum count
             NULL);          // unnamed semaphore
         assert(ghSemaphore != NULL);
         //TODO: take care of NULL return -> exception
