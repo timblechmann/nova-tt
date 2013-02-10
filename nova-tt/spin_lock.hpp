@@ -63,18 +63,18 @@ public:
     };
 
     spin_lock(void):
-        state(unlocked_state)
+        state((bool)unlocked_state)
     {}
 
     ~spin_lock(void)
     {
-        assert (state == unlocked_state);
+        assert (state == (bool)unlocked_state);
     }
 
     void lock(void)
     {
         for(;;) {
-            while (state.load(boost::memory_order_relaxed) != unlocked_state)
+			while (state.load(boost::memory_order_relaxed) != (bool)unlocked_state)
                 detail::pause();
 
             if (try_lock())
@@ -84,13 +84,13 @@ public:
 
     bool try_lock(void)
     {
-        return state.exchange(locked_state, boost::memory_order_acquire) == unlocked_state;
+        return state.exchange((bool)locked_state, boost::memory_order_acquire) == (bool)unlocked_state;
     }
 
     void unlock(void)
     {
-        assert(state.load(boost::memory_order_relaxed) == locked_state);
-        state.store(unlocked_state, boost::memory_order_release);
+        assert(state.load(boost::memory_order_relaxed) == (bool)locked_state);
+        state.store((bool)unlocked_state, boost::memory_order_release);
     }
 };
 
