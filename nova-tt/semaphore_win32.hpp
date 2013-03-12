@@ -43,7 +43,7 @@ public:
         ghSemaphore = CreateSemaphore(
             NULL,           // default security attributes
             i,  // initial count
-            (std::numeric_limits<LONG>::numeric_limits::max)(),  // maximum count
+            (std::numeric_limits<LONG>::max)(),  // maximum count
             NULL);          // unnamed semaphore
         assert(ghSemaphore != NULL);
         //TODO: take care of NULL return -> exception
