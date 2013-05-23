@@ -26,11 +26,10 @@
 
 #include "boost/thread/shared_mutex.hpp"
 
-#ifdef _WIN32
-#include "boost/thread/shared_mutex.hpp"
+#ifndef _WIN32
+#include "pthread.h"
 #endif
 
-#include "pthread.h"
 #include "boost/thread/locks.hpp"
 #include "branch_hints.hpp"
 
