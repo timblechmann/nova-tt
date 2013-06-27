@@ -43,7 +43,7 @@ class semaphore:
 public:
     semaphore(unsigned int i=0)
     {
-        kern_return_t status = semaphore_create(mach_task_self(), &sem,  SYNC_POLICY_FIXED_PRIORITY, i);
+        kern_return_t status = semaphore_create(mach_task_self(), &sem,  SYNC_POLICY_FIFO, i);
         assert(status == KERN_SUCCESS);
     }
 

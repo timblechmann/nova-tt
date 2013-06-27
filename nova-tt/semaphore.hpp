@@ -34,8 +34,8 @@
 #include "semaphore_posix.hpp"
 
 // mach semaphores seem to be broken
-// #elif defined(__APPLE__)
-// #include "semaphore_mach.hpp"
+#elif defined(__APPLE__)
+#include "semaphore_mach.hpp"
 
 #elif defined(_POSIX_TIMEOUTS) && (_POSIX_TIMEOUTS - 200112L) >= 0L
 #include "semaphore_pthreads.hpp"
