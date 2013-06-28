@@ -3,6 +3,7 @@ file(GLOB headers ../nova-tt/*hpp)
 set(tests
     mlock_test.cpp
     nanosleep_test.cpp
+    physical_concurrency_test.cpp
     rw_mutex_test.cpp
     rw_spinlock_test.cpp
     semaphore_test.cpp
