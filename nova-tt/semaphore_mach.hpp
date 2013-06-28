@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include <boost/noncopyable.hpp>
+#include <boost/static_assert.hpp>
 
 #include <mach/mach_traps.h>
 #include <mach/semaphore.h>
