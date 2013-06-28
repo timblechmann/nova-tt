@@ -27,7 +27,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#if (__APPLE__)
+#if defined(__APPLE__)
 #include <sys/sysctl.h>
 #endif
 
@@ -35,10 +35,11 @@ namespace nova   {
 
 inline size_t physical_concurrency()
 {
-#if (__APPLE__)
-	int ret;
-	sysctlbyname("hw.physicalcpu", &physicalCores, sizeof(physicalCores), NULL, 0);
-	return (size_t)ret;
+#if defined(__APPLE__)
+	size_t ret;
+	size_t sz = sizeof(ret);
+	sysctlbyname("hw.physicalcpu", &ret, &sz, NULL, 0);
+	return ret;
 #elif(__linux__)
 	// may fail if some CPUs
 	try {
