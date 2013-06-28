@@ -3,38 +3,34 @@
 
 #include "semaphore.hpp"
 
-#include <boost/thread/thread.hpp>
+#include <chrono>
+#include <future>
+#include <thread>
 
 using namespace nova;
 using namespace boost;
-
-inline timespec ptime_to_timespec (const boost::posix_time::ptime &tm)
-{
-   const boost::posix_time::ptime epoch(boost::gregorian::date(1970,1,1));
-   boost::posix_time::time_duration duration (tm - epoch);
-   timespec ts;
-   ts.tv_sec  = duration.total_seconds();
-   ts.tv_nsec = duration.total_nanoseconds() % 1000000000;
-   return ts;
-}
-
 
 BOOST_AUTO_TEST_CASE( sem_timed_wait )
 {
     timed_semaphore sem;
 
-    system_time const timeout = get_system_time() + posix_time::milliseconds(500);
+    auto now = std::chrono::high_resolution_clock::now().time_since_epoch() + std::chrono::milliseconds(500);
 
-    struct timespec timeoutspec = ptime_to_timespec(timeout);
+    auto seconds     = std::chrono::duration_cast<std::chrono::seconds>(now);
+    auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(seconds - now);
+
+    struct timespec timeoutspec;
+    timeoutspec.tv_sec  = seconds.count();
+    timeoutspec.tv_nsec = nanoseconds.count();
+
     int status = sem.timed_wait(timeoutspec);
     BOOST_REQUIRE(!status);
 }
 
+namespace {
 
-namespace
-{
 const int thread_count = 8;
-const int iterations_per_thread = 100000;
+const int iterations_per_thread = 1000000;
 
 int count = 0;
 
@@ -53,11 +49,16 @@ void test_fn(void)
 
 BOOST_AUTO_TEST_CASE( sem_test )
 {
-    thread_group g;
-
-    for (int i = 0; i != thread_count; ++i)
-        g.create_thread(test_fn);
-    g.join_all();
+    {
+        auto a0 = std::async(std::launch::async, test_fn);
+        auto a1 = std::async(std::launch::async, test_fn);
+        auto a2 = std::async(std::launch::async, test_fn);
+        auto a3 = std::async(std::launch::async, test_fn);
+        auto a4 = std::async(std::launch::async, test_fn);
+        auto a5 = std::async(std::launch::async, test_fn);
+        auto a6 = std::async(std::launch::async, test_fn);
+        auto a7 = std::async(std::launch::async, test_fn);
+    }
 
     BOOST_REQUIRE_EQUAL(count, iterations_per_thread * thread_count);
 }
@@ -67,4 +68,13 @@ BOOST_AUTO_TEST_CASE( sem_sync_test )
     semaphore sem(0);
     sem.post();
     semaphore_sync<semaphore> sync(sem);
+}
+
+BOOST_AUTO_TEST_CASE( sem_try_wait_test )
+{
+    semaphore sem(0);
+
+    BOOST_REQUIRE(!sem.try_wait());
+    sem.post();
+    BOOST_REQUIRE(sem.try_wait());
 }
