@@ -25,7 +25,6 @@
 
 #include <pthread.h>
 
-#include <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 #include <mach/thread_policy.h>
 #include <mach/thread_act.h>
 
