@@ -31,9 +31,19 @@
 
 #endif
 
+#ifdef __linux__
 
-namespace nova
-{
+// 3.14 onwards has a deadine scheduler
+
+#define NOVA_TT_PRIORITY_PERIOD_COMPUTATION_CONSTRAINT
+
+#include <sys/syscall.h>
+#include <sched.h>
+#include <unistd.h>
+
+#endif
+
+namespace nova {
 
 inline int thread_priority(void)
 {
@@ -47,8 +57,7 @@ inline int thread_priority(void)
     return param.sched_priority;
 }
 
-namespace detail
-{
+namespace detail {
 
 inline std::pair<int, int> thread_priority_interval(int policy)
 {
@@ -91,6 +100,57 @@ inline bool thread_set_priority_rt(int priority)
 {
     return detail::thread_set_priority(SCHED_FIFO, priority);
 }
+#endif
+
+#ifdef __linux__
+
+/* copied from the linux headers */
+#ifndef SCHED_DEADLINE
+#define SCHED_DEADLINE               6
+#endif
+
+#ifndef __NR_sched_getattr
+#define __NR_sched_getattr 275
+#endif
+
+
+struct sched_attr {
+    typedef std::uint32_t u32;
+    typedef std::int32_t  s32;
+    typedef std::uint64_t u64;
+
+    u32 size;
+    u32 sched_policy;
+    u64 sched_flags;
+
+    /* SCHED_NORMAL, SCHED_BATCH */
+    s32 sched_nice;
+    /* SCHED_FIFO, SCHED_RR */
+    u32 sched_priority;
+    /* SCHED_DEADLINE */
+    u64 sched_runtime;
+    u64 sched_deadline;
+    u64 sched_period;
+};
+
+inline bool thread_set_priority_rt(int period, int computation, int constraint, bool preemptible)
+{
+    const pid_t tid = syscall(SYS_gettid);
+
+    sched_attr attr;
+
+    attr.size           = sizeof(sched_attr);
+    attr.sched_policy   = SCHED_DEADLINE;
+    attr.sched_flags    = 0;
+    attr.sched_runtime  = computation;
+    attr.sched_deadline = constraint;
+    attr.sched_period   = period;
+
+    int status = syscall(__NR_sched_getattr, &attr, 0);
+
+    return status == 0;
+}
+
 #endif
 
 }  /* namespace nova */
