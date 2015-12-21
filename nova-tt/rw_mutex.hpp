@@ -31,7 +31,7 @@
 #endif
 
 #include "boost/thread/locks.hpp"
-#include "branch_hints.hpp"
+
 
 namespace nova {
 namespace nova_tt {
@@ -213,7 +213,7 @@ public:
 
     void lock_shared(void)
     {
-        if (unlikely(writer_id == pthread_self()))
+        if (BOOST_UNLIKELY(writer_id == pthread_self()))
             /* we're already owning it as writer */
             return;
         nonrecursive_rw_mutex::lock_shared();
@@ -221,7 +221,7 @@ public:
 
     bool try_lock_shared(void)
     {
-        if (unlikely(writer_id == pthread_self()))
+        if (BOOST_UNLIKELY(writer_id == pthread_self()))
             /* we're already owning it as writer */
             return true;
 
@@ -230,7 +230,7 @@ public:
 
     void unlock_shared(void)
     {
-        if (unlikely(writer_id == pthread_self()))
+        if (BOOST_UNLIKELY(writer_id == pthread_self()))
             /* we're owning it as writer */
             return;
 
