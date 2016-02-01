@@ -48,6 +48,29 @@ inline bool thread_set_affinity(int i)
 
 }
 
+#elif __APPLE__
+
+#include <pthread.h>
+
+#include <mach/thread_policy.h>
+#include <mach/thread_act.h>
+
+namespace nova {
+
+inline bool thread_set_affinity(int i)
+{
+    thread_affinity_policy affinityPolicy { i + 1 };
+    kern_return_t status = thread_policy_set( pthread_mach_thread_np(pthread_self()),
+                                              THREAD_AFFINITY_POLICY,
+                                              (thread_policy_t)&affinityPolicy,
+                                              THREAD_AFFINITY_POLICY_COUNT
+                                            );
+
+    return status == KERN_SUCCESS;
+}
+
+}
+
 #else
 
 namespace nova {
