@@ -41,6 +41,14 @@ namespace nova_tt {
  *  except for bool timed_lock_shared(boost::system_time  const&  abs_time) all SharedLockable members
  *  are provided
  * */
+ 
+#ifdef _WIN32
+ 
+// we cannot use the posix-based rw_mutex, as we cannot access the write_id, so we use boost's implementation instead
+typedef boost::shared_mutex nonrecursive_rw_mutex;
+ 
+#else
+ 
 class nonrecursive_rw_mutex
 {
 public:
@@ -121,13 +129,6 @@ public:
     typedef boost::unique_lock<nonrecursive_rw_mutex> unique_lock;
     typedef boost::shared_lock<nonrecursive_rw_mutex> shared_lock;
 };
-
-#ifdef _WIN32
-
-// we cannot use the posix-based rw_mutex, as we cannot access the write_id, so we use boost's implementation instead
-typedef boost::shared_mutex rw_mutex;
-
-#else
 
 /** reader-writer mutex class, implementing a subset of the SharedLockable concept
  *
@@ -251,7 +252,9 @@ private:
 } /* namespace nova-tt */
 
 using nova_tt::nonrecursive_rw_mutex;
+#ifndef _WIN32
 using nova_tt::rw_mutex;
+#endif
 
 } /* namespace nova */
 
