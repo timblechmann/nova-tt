@@ -22,6 +22,7 @@
 #define NOVA_TT_SPIN_LOCK_HPP
 
 #include <cassert>
+#include <cstdint>
 
 #include <boost/atomic.hpp>
 
@@ -98,7 +99,7 @@ struct padded_spin_lock:
     public spin_lock
 {
     static const int padding_bytes = 64 - sizeof(spin_lock);
-    boost::uint8_t padding[padding_bytes];
+    std::uint8_t padding[padding_bytes];
 };
 
 } /* namespace nova */
